@@ -4,7 +4,7 @@
     xsi:noNamespaceSchemaLocation="http://schema.phpunit.de/7.0/phpunit.xsd"
     colors="true">
     <testsuites>
-        <testsuite name="Test Suite">
+        <testsuite name="Zef\\Zel Tests">
             <directory>./tests</directory>
         </testsuite>
     </testsuites>
