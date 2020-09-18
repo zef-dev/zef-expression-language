@@ -16,7 +16,7 @@
 	},
 	"autoload" : {
 		"psr-4" : {
-			"Zef\\Zel\\" : "src"
+			"Zef\\Zel\\" : "src/Zef/Zel"
 		}
 	},
 	"autoload-dev" : {
