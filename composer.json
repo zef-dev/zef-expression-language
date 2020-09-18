@@ -1,8 +1,10 @@
 {
 	"name" : "zef-dev/zef-expression-language",
-	"description" : "An extension for Smfony Expression Language",
+    "type": "library",
+	"description" : "An extension for Symfony Expression Language",
+    "homepage": "https://zef.dev",
 	"keywords" : [
-		"symfony"
+		"symfony", "expression-language"
 	],
 	"license" : "MIT",
 	"require" : {
