@@ -2,10 +2,20 @@
 <phpunit
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:noNamespaceSchemaLocation="http://schema.phpunit.de/7.0/phpunit.xsd"
-    colors="true">
+    backupGlobals="false"
+    colors="true"
+    bootstrap="vendor/autoload.php"
+    failOnRisky="true"
+    failOnWarning="true"
+    cacheResult="false">
+    
+    <php>
+        <ini name="error_reporting" value="-1" />
+    </php>
+    
     <testsuites>
         <testsuite name="Zef\\Zel Tests">
-            <directory>./tests</directory>
+            <directory>./tests/</directory>
         </testsuite>
     </testsuites>
 
