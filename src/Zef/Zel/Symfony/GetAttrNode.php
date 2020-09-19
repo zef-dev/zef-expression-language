@@ -15,6 +15,10 @@ class GetAttrNode extends \Symfony\Component\ExpressionLanguage\Node\GetAttrNode
                     return null;    
                 }
                 
+                if (empty($obj)) {
+                    return null;  
+                }
+                
                 if (!\is_object($obj)) {
                     throw new \RuntimeException('Unable to get a property on a non-object. ['.gettype( $obj).']');
                 }
