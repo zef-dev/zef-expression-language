@@ -45,7 +45,8 @@ $resolver           =   new ArrayResolver([]);
 $evaluated          =   $expressionLanguage->evaluate( 'true', $resolver->getValues());
 
 // now you can access array fields in dot notation
-$evaluated          =   $expressionLanguage->evaluate( 'myvar.myfield', ['myvar'=>['myfield'=>true]]);
+$resolver           =   new ArrayResolver(['myvar'=>['myfield'=>true]]);
+$evaluated          =   $expressionLanguage->evaluate( 'myvar.myfield', $resolver->getValues());
 
 // now you can access getters in shorten way
 $obj    =   new Myclass();
@@ -53,9 +54,10 @@ $obj->getName();
 $obj->isValid();
 $obj->hasErrror();
 
-$evaluated          =   $expressionLanguage->evaluate( 'myvar.name', ['myvar'=>$obj]);
-$evaluated          =   $expressionLanguage->evaluate( 'myvar.valid', ['myvar'=>$obj]);
-$evaluated          =   $expressionLanguage->evaluate( 'myvar.error', ['myvar'=>$obj]);
+$resolver           =   new ArrayResolver(['myvar'=>$obj]);
+$evaluated          =   $expressionLanguage->evaluate( 'myvar.name', $resolver->getValues());
+$evaluated          =   $expressionLanguage->evaluate( 'myvar.valid', $resolver->getValues());
+$evaluated          =   $expressionLanguage->evaluate( 'myvar.error', $resolver->getValues());
 
         
 ```
