@@ -40,8 +40,18 @@ class NotSetEvaluationTest extends TestCase
     public function testResolveToNullSymfony( $expression, array $values, $expected)
     {
         $expressionLanguage =   new ExpressionLanguage();
-//         $resolver           =   new ArrayResolver( $values);
-//         $values             =   $resolver->getValues();
+        
+        $this->assertEquals( $expected, $expressionLanguage->evaluate( $expression, $values));
+    }
+
+    /**
+     * @dataProvider resolveToNullSymfonyProvider
+     */
+    public function testResolveToNullSymfonyWrapped( $expression, array $values, $expected)
+    {
+        $expressionLanguage =   new ExpressionLanguage();
+        $resolver           =   new ArrayResolver( $values);
+        $values             =   $resolver->getValues();
         
         $this->assertEquals( $expected, $expressionLanguage->evaluate( $expression, $values));
     }
