@@ -11,6 +11,8 @@ class NotSetEvaluationTest extends TestCase
      * @dataProvider provideSimpleValues
      * @dataProvider provideArrayValues
      * @dataProvider provideJuelArrayValues
+     * @dataProvider provideObjectProps
+     * @dataProvider provideJuelObjectMethods
      */
     public function testResolveToNullWrapped( $expression, array $values, $expected)
     {
@@ -24,6 +26,7 @@ class NotSetEvaluationTest extends TestCase
     /**
      * @dataProvider provideSimpleValues
      * @dataProvider provideArrayValues
+     * @dataProvider provideObjectProps
      */
     public function testResolveToNullBasic( $expression, array $values, $expected)
     {
@@ -64,6 +67,36 @@ class NotSetEvaluationTest extends TestCase
             ['myarr[\'value\']', ['myarr' => []], null],
             ['myarr[\'value\'][\'value2\']', ['myarr' => []], null],
             ['!myarr[\'value\']', ['myarr' => []], true],
+        ];
+    }
+    
+    public function provideObjectProps()
+    {
+        $child          =   new stdClass();
+        $parent         =   new stdClass();
+        $parent->child  =   $child;
+        $empty_parent   =   new stdClass();
+        
+        return [
+            ['myobj.novalue', ['myobj' => $empty_parent], null],
+            ['myobj.child.novalue', ['myobj' => $empty_parent], null],
+            ['myobj.child.novalue', ['myobj' => $parent], null],
+        ];
+    }
+    
+    public function provideJuelObjectMethods()
+    {
+        $child          =   new stdClass();
+        $parent         =   new stdClass();
+        $parent->getChild   =   function () use ( $child) {
+            return $child;
+        };
+        
+        $empty_parent   =   new stdClass();
+        return [
+            ['myobj.novalue', ['myobj' => $empty_parent], null],
+            ['myobj.child.novalue', ['myobj' => $empty_parent], null],
+            ['myobj.child.novalue', ['myobj' => $parent], null],
         ];
     }
 
