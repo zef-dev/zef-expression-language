@@ -53,6 +53,7 @@ class NotSetEvaluationTest extends TestCase
             ['!myvar', [], true],
             ['myvar || true', [], true],
             ['myarr[\'value\']', ['myarr' => []], null],
+            ['myarr[\'value\'][\'value2\']', ['myarr' => []], null],
             ['!myarr[\'value\']', ['myarr' => []], true],
         ];
     }

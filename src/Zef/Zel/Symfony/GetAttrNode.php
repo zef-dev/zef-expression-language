@@ -50,7 +50,7 @@ class GetAttrNode extends \Symfony\Component\ExpressionLanguage\Node\GetAttrNode
                     throw new \RuntimeException('Unable to get an item on a non-array.');
                 }
                 
-                return $array[$this->nodes['attribute']->evaluate($functions, $values)];
+                return $array[$this->nodes['attribute']->evaluate($functions, $values)] ?? null;
         }
     }
     
