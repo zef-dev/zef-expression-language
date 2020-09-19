@@ -8,9 +8,24 @@ use Zef\Zel\ArrayResolver;
 class NotSetEvaluationTest extends TestCase
 {
     /**
-     * @dataProvider resolveToNullProvider
+     * @dataProvider provideSimpleValues
+     * @dataProvider provideArrayValues
+     * @dataProvider provideJuelArrayValues
      */
-    public function testResolveToNull( $expression, array $values, $expected)
+    public function testResolveToNullWrapped( $expression, array $values, $expected)
+    {
+        $expressionLanguage =   new ExpressionLanguage();
+        $resolver           =   new ArrayResolver( $values);
+        $values             =   $resolver->getValues();
+        
+        $this->assertEquals( $expected, $expressionLanguage->evaluate( $expression, $values));
+    }
+
+    /**
+     * @dataProvider provideSimpleValues
+     * @dataProvider provideArrayValues
+     */
+    public function testResolveToNullBasic( $expression, array $values, $expected)
     {
         $expressionLanguage =   new ExpressionLanguage();
         $resolver           =   new ArrayResolver( $values);
@@ -19,12 +34,18 @@ class NotSetEvaluationTest extends TestCase
         $this->assertEquals( $expected, $expressionLanguage->evaluate( $expression, $values));
     }
     
-    public function resolveToNullProvider()
+    public function provideSimpleValues()
     {
         return [
             ['myvar', [], null],
             ['!myvar', [], true],
             ['myvar || true', [], true],
+        ];
+    }
+
+    public function provideJuelArrayValues()
+    {
+        return [
             ['myarr.value', ['myarr' => []], null],
             ['!myarr.value', ['myarr' => []], true],
             ['myarr.value', ['myarr' => ['value' => true]], true],
@@ -33,30 +54,8 @@ class NotSetEvaluationTest extends TestCase
             ['!myarr.value', ['myarr' => ['valuex' => true]], true],
         ];
     }
-
-    /**
-     * @dataProvider resolveToNullSymfonyProvider
-     */
-    public function testResolveToNullSymfony( $expression, array $values, $expected)
-    {
-        $expressionLanguage =   new ExpressionLanguage();
-        
-        $this->assertEquals( $expected, $expressionLanguage->evaluate( $expression, $values));
-    }
-
-    /**
-     * @dataProvider resolveToNullSymfonyProvider
-     */
-    public function testResolveToNullSymfonyWrapped( $expression, array $values, $expected)
-    {
-        $expressionLanguage =   new ExpressionLanguage();
-        $resolver           =   new ArrayResolver( $values);
-        $values             =   $resolver->getValues();
-        
-        $this->assertEquals( $expected, $expressionLanguage->evaluate( $expression, $values));
-    }
     
-    public function resolveToNullSymfonyProvider()
+    public function provideArrayValues()
     {
         return [
             ['myvar', [], null],
