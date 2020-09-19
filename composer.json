@@ -1,8 +1,8 @@
 {
 	"name" : "zef-dev/zef-expression-language",
     "type": "library",
-	"description" : "An extension for Symfony Expression Language",
-    "homepage": "https://zef.dev",
+	"description" : "A JUEL like extension for Symfony Expression Language",
+    "homepage": "https://github.com/zef-dev/zef-expression-language",
 	"keywords" : [
 		"symfony", "expression-language"
 	],
