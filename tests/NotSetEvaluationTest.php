@@ -51,8 +51,6 @@ class NotSetEvaluationTest extends TestCase
         return [
             ['myarr.value', ['myarr' => []], null],
             ['!myarr.value', ['myarr' => []], true],
-            ['myarr.value', ['myarr' => ['value' => true]], true],
-            ['!myarr.value', ['myarr' => ['value' => true]], false],
             ['myarr.value', ['myarr' => ['valuex' => true]], null],
             ['!myarr.value', ['myarr' => ['valuex' => true]], true],
         ];
