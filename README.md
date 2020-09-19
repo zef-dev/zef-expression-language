@@ -1,28 +1,61 @@
-# PHP Boilerplate
+# ZEF Expression Language
 
-A boilerplate for new composer based PHP projects.
+A simple extension to the [Symfony Expression Language](https://github.com/symfony/expression-language) which enables more [JUEL](http://juel.sourceforge.net) like behaviour.
 
-## Getting started
+* it will not break on non existing values - it evalueates to `null`
+* it enables you tu use JUEL style accessing to array values and object methods (dot notation)
+
+
+## Installation
 
 ```bash
 # With composer
-$ composer create-project kreait/php-boilerplate new-project
-
-# With git
-$ git clone git@github.com:kreait/php-boilerplate.git new-project && cd $_ && rm -rf .git && git init
+$ composer install zef-dev/zef-expression-language
 ```
 
-### Update `composer.json`
 
-Replace the Namespaces in the `autoload` and `autoload-dev` sections with your project's namespaces
-and run `composer dump-autoload`.
+## Usage
 
-### (Optional) Update `.gitattributes`
+Just replace Symfony `ExpressionLanguage` with the Zef one.
 
-Remove the comments in `.gitattributes` so that unneeded files for your package won't get included in your releases.
+```php
 
-### (Optional) Add `composer.lock` to the `.gitignore` file
+use Zef\Zel\Symfony\ExpressionLanguage;
 
-If you're creating an application instead of a library, it is considered good practice to commit the `composer.lock` file together with the rest of the code.
+$expressionLanguage =   new ExpressionLanguage();
+$evaluated          =   $expressionLanguage->evaluate( 'true', []);
 
-### Start coding! :smile:
+// will not throw an exception any more
+$evaluated          =   $expressionLanguage->evaluate( 'myvar', []);
+$evaluated          =   $expressionLanguage->evaluate( 'myvar[\'myfield\']', ['myvar'=>[]]);
+
+```
+
+## JUEL like usage
+
+To gain JUEL like evaluation addon, warp your values array in `ArrayResolver`.
+
+```php
+
+use Zef\Zel\Symfony\ExpressionLanguage;
+use Zef\Zel\ArrayResolver;
+
+$expressionLanguage =   new ExpressionLanguage();
+$resolver           =   new ArrayResolver([]);
+$evaluated          =   $expressionLanguage->evaluate( 'true', $resolver->getValues());
+
+// now you can access array fields in dot notation
+$evaluated          =   $expressionLanguage->evaluate( 'myvar.myfield', ['myvar'=>['myfield'=>true]]);
+
+// now you can access getters in shorten way
+$obj    =   new Myclass();
+$obj->getName();
+$obj->isValid();
+$obj->hasErrror();
+
+$evaluated          =   $expressionLanguage->evaluate( 'myvar.name', ['myvar'=>$obj]);
+$evaluated          =   $expressionLanguage->evaluate( 'myvar.valid', ['myvar'=>$obj]);
+$evaluated          =   $expressionLanguage->evaluate( 'myvar.error', ['myvar'=>$obj]);
+
+        
+```
