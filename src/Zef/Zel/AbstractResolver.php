@@ -17,7 +17,7 @@ abstract class AbstractResolver implements IValueAdapter, Countable
 			$rsv = new ArrayResolver( $value);
 			return $rsv;
 		}
-		if ( is_object( $value) && !is_a( $value, 'Convo\Core\Evaluation\IValueAdapter')) {
+		if ( is_object( $value) && !is_a( $value, 'Zef\Zel\IValueAdapter')) {
 			$rsv = new ObjectResolver( $value);
 			return $rsv;
 		}
