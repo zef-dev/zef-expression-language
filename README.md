@@ -2,15 +2,15 @@
 
 A simple extension to the [Symfony Expression Language](https://github.com/symfony/expression-language) which enables more [JUEL](http://juel.sourceforge.net) like behaviour.
 
-* it will not break on non existing values - it evalueates to `null`
-* it enables you tu use JUEL style accessing to array values and object methods (dot notation)
+* it will not break on non existing values - it will evaluate to `null`
+* it enables you to use JUEL style accessing to array values and object methods (dot notation)
 
 
 ## Installation
 
 ```bash
 # With composer
-$ composer install zef-dev/zef-expression-language
+$ composer require zef-dev/zef-expression-language
 ```
 
 
@@ -33,7 +33,7 @@ $evaluated          =   $expressionLanguage->evaluate( 'myvar[\'myfield\']', ['m
 
 ## JUEL like usage
 
-To gain JUEL like evaluation addon, warp your values array in `ArrayResolver`.
+To gain JUEL like evaluation addon, wrap your values array in `ArrayResolver`.
 
 ```php
 
@@ -48,7 +48,7 @@ $evaluated          =   $expressionLanguage->evaluate( 'true', $resolver->getVal
 $resolver           =   new ArrayResolver(['myvar'=>['myfield'=>true]]);
 $evaluated          =   $expressionLanguage->evaluate( 'myvar.myfield', $resolver->getValues());
 
-// now you can access getters in shorten way
+// now you can access getters in a shorter way
 $obj    =   new Myclass();
 $obj->getName();
 $obj->isValid();
@@ -61,3 +61,13 @@ $evaluated          =   $expressionLanguage->evaluate( 'myvar.error', $resolver-
 
         
 ```
+
+## Note about implementation
+
+We wanted to extend Symfony classes and override just what was necessary, but as the original classes were not written in a manner to allow it easily, we ended up copy/pasting some classes completely just to be able implement few minor modifications.
+
+
+
+
+---
+This package is created based on the [PHP Boilerplate](https://github.com/kreait/php-boilerplate)
