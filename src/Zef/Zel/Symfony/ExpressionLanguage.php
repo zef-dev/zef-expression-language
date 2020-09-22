@@ -12,6 +12,10 @@ use Symfony\Component\ExpressionLanguage\ExpressionFunctionProviderInterface;
 use Symfony\Component\ExpressionLanguage\Expression;
 
 /**
+ * This class is copy/paste from Smyfony v4.4 and modified to use Zef\Zel\Parser
+ */
+
+/**
  * Allows to compile and evaluate expressions written in your own DSL.
  *
  * @author Fabien Potencier <fabien@symfony.com>

@@ -14,6 +14,10 @@ use Symfony\Component\ExpressionLanguage\Node\FunctionNode;
 use Symfony\Component\ExpressionLanguage\Node\ArrayNode;
 use Symfony\Component\ExpressionLanguage\Node\ArgumentsNode;
 
+/**
+ * This class is copy/paste from Smyfony v4.4. It seemed impossible to just extend and implement only changed methods.
+ */
+
 class Parser
 {
     const OPERATOR_LEFT = 1;
