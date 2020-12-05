@@ -5,4 +5,5 @@
 /.php_cs.cache
 /.settings/
 /.buildpath
+/.project
 /composer.lock
