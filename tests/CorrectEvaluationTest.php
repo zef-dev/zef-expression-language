@@ -4,6 +4,8 @@ use PHPUnit\Framework\TestCase;
 
 use Zef\Zel\Symfony\ExpressionLanguage;
 use Zef\Zel\ArrayResolver;
+use Symfony\Component\ExpressionLanguage\ExpressionFunctionProviderInterface;
+use Symfony\Component\ExpressionLanguage\ExpressionFunction;
 
 class CorrectEvaluationTest extends TestCase
 {
@@ -13,10 +15,20 @@ class CorrectEvaluationTest extends TestCase
      * @dataProvider provideJuelArrayValues
      * @dataProvider provideObjectProps
      * @dataProvider provideJuelObjectMethods
+     * @dataProvider provideObjectsAndFunctions
      */
     public function testResolveWrapped( $expression, array $values, $expected)
     {
-        $expressionLanguage =   new ExpressionLanguage();
+        $provider           =   new class() implements ExpressionFunctionProviderInterface {
+            public function getFunctions()
+            {
+                $functions    =   [];
+                $functions[] = ExpressionFunction::fromPhp( 'stripos');
+                return $functions;
+            }
+        };
+        
+        $expressionLanguage =   new ExpressionLanguage( null, [$provider]);
         $resolver           =   new ArrayResolver( $values);
         $values             =   $resolver->getValues();
         
@@ -75,6 +87,21 @@ class CorrectEvaluationTest extends TestCase
         return [
             ['myobj.value', ['myobj' => $child], true],
             ['myobj.child.value', ['myobj' => $parent], true],
+        ];
+    }
+    
+    public function provideObjectsAndFunctions()
+    {
+        $child          =   new stdClass();
+        $child->value   =   true;
+        $child->title   =   'The man who sold the world';
+        
+        return [
+            ['myobj.title', ['myobj' => $child], 'The man who sold the world'],
+            ['stripos( myobj.title, \'The\')', ['myobj' => $child], 0],
+            ['stripos( myobj.title, \'Gle\')', ['myobj' => $child], false],
+            ['stripos( myobj.title, \'The\') !== false ? \'found\' : \'not\'', ['myobj' => $child], 'found'],
+            ['stripos( myobj.title, \'Gle\') !== false ? \'found\' : \'not\'', ['myobj' => $child], 'not'],
         ];
     }
     
