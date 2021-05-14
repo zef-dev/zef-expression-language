@@ -10,7 +10,7 @@
 	"require" : {
 		"php" : "^7.2.5",
         "psr/cache" : "^1.0.1",
-        "symfony/expression-language" : "^5.2"
+        "symfony/expression-language" : "^5"
 	},
 	"require-dev" : {
 		"phpunit/phpunit" : "^8.0",
