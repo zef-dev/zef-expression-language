@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## 1.1.0 - 2021-05-14
+
+* Use Smfony 5
+
+
 ## 1.0.2 - 2020-09-22
 
 * Corrected type checking when wrapping values in resolver.
