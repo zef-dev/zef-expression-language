@@ -48,6 +48,13 @@ class ObjectResolver extends AbstractResolver
 			}
 		}
 	}
+
+	public function __call($name, $arguments)
+	{
+		if (method_exists($this->_object, $name)) {
+			return $this->_fixValue($this->_object->$name(...$arguments));
+		}
+	}
 	
 	private function _getVariants( $name) {
 		$name		=	ucfirst( $name);
