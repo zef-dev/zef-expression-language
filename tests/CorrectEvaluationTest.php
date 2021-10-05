@@ -140,7 +140,7 @@ class CorrectEvaluationTest extends TestCase
     public function provideObjectMethods()
     {
         $child = new class() {
-            public function getName() { return 'Doofus'; }
+            public function greet($name) { return "Hello $name"; }
         };
         $user = new class($child)
         {
@@ -161,7 +161,7 @@ class CorrectEvaluationTest extends TestCase
 
         return [
             ['user.getName()', ['user' => $user], 'Test'],
-            ['user.getName()']
+            ['user.getChild().greet(\'Goofus\')', ['user' => $user], 'Hello Goofus']
         ];
     }
 }
