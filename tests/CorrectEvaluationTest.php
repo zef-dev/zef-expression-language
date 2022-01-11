@@ -1,11 +1,14 @@
 <?php
 
+use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Framework\TestCase;
-
+use SebastianBergmann\RecursionContext\InvalidArgumentException;
 use Zef\Zel\Symfony\ExpressionLanguage;
 use Zef\Zel\ArrayResolver;
 use Symfony\Component\ExpressionLanguage\ExpressionFunctionProviderInterface;
 use Symfony\Component\ExpressionLanguage\ExpressionFunction;
+use Symfony\Component\ExpressionLanguage\SyntaxError;
+use Zef\Zel\ObjectResolver;
 
 class CorrectEvaluationTest extends TestCase
 {
@@ -16,6 +19,7 @@ class CorrectEvaluationTest extends TestCase
      * @dataProvider provideObjectProps
      * @dataProvider provideJuelObjectMethods
      * @dataProvider provideObjectsAndFunctions
+     * @dataProvider provideObjectMethods
      */
     public function testResolveWrapped( $expression, array $values, $expected)
     {
@@ -133,5 +137,31 @@ class CorrectEvaluationTest extends TestCase
         ];
     }
 
+    public function provideObjectMethods()
+    {
+        $child = new class() {
+            public function greet($name) { return "Hello $name"; }
+        };
+        $user = new class($child)
+        {
+            private $_name = 'Test';
 
+            private $_child;
+
+            public function __construct($child)
+            {
+                $this->_child = $child;
+            }
+
+            public function getName() { return $this->_name; }
+
+            public function getChild() { return $this->_child; }
+        };
+        
+
+        return [
+            ['user.getName()', ['user' => $user], 'Test'],
+            ['user.getChild().greet(\'Goofus\')', ['user' => $user], 'Hello Goofus']
+        ];
+    }
 }
