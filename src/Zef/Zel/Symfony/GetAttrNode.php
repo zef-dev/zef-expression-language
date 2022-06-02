@@ -33,7 +33,8 @@ class GetAttrNode extends \Symfony\Component\ExpressionLanguage\Node\GetAttrNode
                 
             case self::METHOD_CALL:
                 $obj = $this->nodes['node']->evaluate($functions, $values);
-                
+                $method = $this->nodes['attribute']->attributes['value'];
+
                 if ( is_null( $obj)) {
                     return null;
                 }
@@ -68,6 +69,12 @@ class GetAttrNode extends \Symfony\Component\ExpressionLanguage\Node\GetAttrNode
 
     private function _shouldCallMethod($callType, $object, $value) {
         $isAccessible = 0;
+        if (is_array($object)) {
+            return true;
+        }
+        if (is_a($object, 'Zef\Zel\IValueAdapter') && is_array($object->get())) {
+            return true;
+        }
         switch ($callType) {
             case self::PROPERTY_CALL:
                 if (in_array($value, array_keys(get_object_vars($object)))) {
@@ -76,6 +83,23 @@ class GetAttrNode extends \Symfony\Component\ExpressionLanguage\Node\GetAttrNode
 
                 if (is_a($object, 'Zef\Zel\IValueAdapter') && in_array($value, array_keys(get_object_vars($object->get())))) {
                     $isAccessible++;
+                }
+
+                $wrappedClassMethods = get_class_methods($object);
+
+                foreach ($wrappedClassMethods as $wrappedClassMethod) {
+                    if (str_contains(strtolower($wrappedClassMethod), strtolower($value))) {
+                        $isAccessible++;
+                    }
+                }
+
+                if (is_a( $object, 'Zef\Zel\IValueAdapter')) {
+                    $originalClassMethods = get_class_methods($object->get());
+                    foreach ($originalClassMethods as $originalClassMethod) {
+                        if (str_contains(strtolower($originalClassMethod), strtolower($value))) {
+                            $isAccessible++;
+                        }
+                    }
                 }
 
                 break;
