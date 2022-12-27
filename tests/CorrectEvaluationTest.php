@@ -40,6 +40,57 @@ class CorrectEvaluationTest extends TestCase
     }
 
     /**
+     * @dataProvider provideAlsoNonPublicObjectMethods
+     */
+    public function testResolveWrappedNonPublicProperties( $expression, array $values, $expected)
+    {
+        $provider           =   new class() implements ExpressionFunctionProviderInterface {
+            public function getFunctions()
+            {
+                $functions    =   [];
+                $functions[] = ExpressionFunction::fromPhp( 'stripos');
+                return $functions;
+            }
+        };
+
+        $expressionLanguage =   new ExpressionLanguage( null, [$provider]);
+        $resolver           =   new ObjectResolver( $values);
+        $values             =   $resolver->get();
+
+        $this->assertEquals( $expected, $expressionLanguage->evaluate( $expression, $values));
+    }
+
+    public function testResolveWrappedPrivateMethodCall()
+    {
+        $child = new class() {
+            public function greet($name) { return "Hello $name"; }
+        };
+        $user = new class($child)
+        {
+            private $test = 'Another Test';
+
+            private $_name = 'Test';
+
+            private $_child;
+
+            public function __construct($child)
+            {
+                $this->_child = $child;
+            }
+
+            private function sayHi() { return 'Hi'; }
+
+            public function getName() { return $this->_name; }
+
+            public function getChild() { return $this->_child; }
+        };
+
+        $this->expectException('RuntimeException');
+        $el = new ExpressionLanguage();
+        $el->evaluate('foo.sayHi()', ['foo' => $user]);
+    }
+
+    /**
      * @dataProvider provideSimpleValues
      * @dataProvider provideArrayValues
      * @dataProvider provideObjectProps
@@ -160,8 +211,36 @@ class CorrectEvaluationTest extends TestCase
         
 
         return [
-            ['user.getName()', ['user' => $user], 'Test'],
-            ['user.getChild().greet(\'Goofus\')', ['user' => $user], 'Hello Goofus']
+            ['user.get().getName()', ['user' => $user], 'Test'],
+            ['user.get().getChild().greet(\'Goofus\')', ['user' => $user], 'Hello Goofus']
+        ];
+    }
+
+    public function provideAlsoNonPublicObjectMethods()
+    {
+        $child = new class() {
+            public function greet($name) { return "Hello $name"; }
+        };
+        $user = new class($child)
+        {
+            private $test = 'Another Test';
+
+            private $_name = 'Test';
+
+            private $_child;
+
+            public function __construct($child)
+            {
+                $this->_child = $child;
+            }
+
+            public function getName() { return $this->_name; }
+
+            public function getChild() { return $this->_child; }
+        };
+
+        return [
+            ['user.test', ['user' => $user], null]
         ];
     }
 }
