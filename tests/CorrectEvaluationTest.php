@@ -1,13 +1,10 @@
 <?php
 
-use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Framework\TestCase;
-use SebastianBergmann\RecursionContext\InvalidArgumentException;
 use Zef\Zel\Symfony\ExpressionLanguage;
 use Zef\Zel\ArrayResolver;
 use Symfony\Component\ExpressionLanguage\ExpressionFunctionProviderInterface;
 use Symfony\Component\ExpressionLanguage\ExpressionFunction;
-use Symfony\Component\ExpressionLanguage\SyntaxError;
 use Zef\Zel\ObjectResolver;
 
 class CorrectEvaluationTest extends TestCase
