@@ -10,6 +10,7 @@ use Symfony\Component\ExpressionLanguage\Compiler;
 use Symfony\Component\ExpressionLanguage\ExpressionFunction;
 use Symfony\Component\ExpressionLanguage\ExpressionFunctionProviderInterface;
 use Symfony\Component\ExpressionLanguage\Expression;
+use Zef\Zel\IValueAdapter;
 
 /**
  * This class is copy/paste from Smyfony v4.4 and modified to use Zef\Zel\Parser
@@ -66,7 +67,11 @@ class ExpressionLanguage
     {
         $parsed =   $this->parse($expression, array_keys($values));
         $nodes  =   $parsed->getNodes();
-        return $nodes->evaluate($this->functions, $values);
+        $value  =   $nodes->evaluate($this->functions, $values);
+        if ( $value instanceof IValueAdapter) {
+            return $value->get();
+        }
+        return $value;
     }
     
     /**
