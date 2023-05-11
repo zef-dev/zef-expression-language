@@ -3,7 +3,7 @@
     "type": "library",
 	"description" : "A JUEL like extension for Symfony Expression Language",
     "homepage": "https://github.com/zef-dev/zef-expression-language",
-    "version": "1.2.0",
+    "version": "1.3.0",
 	"keywords" : [
 		"symfony", "expression-language"
 	],

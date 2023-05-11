@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## 1.3.0 - 2023-05-11
+
+* If evaluated value is value adapter, return clean value
+* When calling functions, cleanup eventual value adapter aruments
+
 ## 1.2.0 - 2022-12-27
 
 * Allow method calls
