@@ -32,6 +32,19 @@ abstract class AbstractResolver implements IValueAdapter, Countable
 		return $value;
 	}
 	
+	public static function cleanValue( $value)
+	{
+	    if ( is_array( $value)) {
+	        foreach ( $value as $k=>$v) {
+	            if ( $v instanceof IValueAdapter) {
+	                $value[$k] = $v->get();
+	            }
+	        }
+	    }
+	    
+	    return $value;
+	}
+	
 	/**
 	 * Returns true if array is indexed (starting with index 0). Will return true for empty arrays too.
 	 * @param array $arr

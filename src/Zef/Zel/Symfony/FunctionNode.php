@@ -14,6 +14,7 @@ namespace Zef\Zel\Symfony;
 use Symfony\Component\ExpressionLanguage\Compiler;
 use Zef\Zel\IValueAdapter;
 use Symfony\Component\ExpressionLanguage\Node\Node;
+use Zef\Zel\AbstractResolver;
 
 /**
  * @author Fabien Potencier <fabien@symfony.com>
@@ -49,12 +50,15 @@ class FunctionNode extends Node
             $arguments[] = $node->evaluate($functions, $values);
         }
         
+        error_log( 'Evaluating function ['.$this->attributes['name'].']');
+        
         $fixed = [];
         foreach ( $arguments as $argument) {
             if ( $argument instanceof IValueAdapter) {
+                error_log( 'Trimming array value adapter');
                 $fixed[] = $argument->get();
             } else {
-                $fixed[] = $argument;
+                $fixed[] = AbstractResolver::cleanValue( $argument);
             }
         }
         
