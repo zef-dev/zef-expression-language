@@ -56,6 +56,42 @@ class CorrectEvaluationTest extends TestCase
 
         $this->assertEquals( $expected, $expressionLanguage->evaluate( $expression, $values));
     }
+    
+    
+    /**
+     * @dataProvider provideWrappedArrayyValues
+     */
+    public function testResolveWrappedArrays( $expression, $expected)
+    {
+        $provider           =   new class() implements ExpressionFunctionProviderInterface {
+            public function getFunctions()
+            {
+                $functions    =   [];
+                $functions[] = ExpressionFunction::fromPhp( 'json_encode');
+                return $functions;
+            }
+        };
+        
+        $values =   [
+            'temp' => 'something',
+            'data' => [
+                ['index'=>'a'],
+                ['index'=>'b'],
+            ]
+        ];
+        
+        $expressionLanguage =   new ExpressionLanguage( null, [$provider]);
+        $resolver           =   new ArrayResolver( $values);
+        
+        $this->assertEquals( $expected, $expressionLanguage->evaluate( $expression, $resolver->getValues()));
+    }
+    
+    public function provideWrappedArrayyValues()
+    {
+        return [
+            ['json_encode( data)', '[{"index":"a"},{"index":"b"}]']
+        ];
+    }
 
     public function testResolveWrappedPrivateMethodCall()
     {
