@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 1.3.1 - 2023-07-14
+
+* Corrected function argument cleanup of IValueAdapter in case with nested arrays
+
 ## 1.3.0 - 2023-05-11
 
 * If evaluated value is value adapter, return clean value
