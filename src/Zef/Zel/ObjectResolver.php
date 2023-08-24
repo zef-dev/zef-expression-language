@@ -28,7 +28,10 @@ class ObjectResolver extends AbstractResolver
 
 	public function get()
 	{
-		return $this->_object;
+	    if ( !func_num_args()) {
+	        return $this->_object;
+	    }
+	    return $this->__call( 'get', func_get_args());
 	}
 	
 	public function __get( $name) {

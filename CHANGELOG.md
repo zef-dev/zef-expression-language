@@ -1,5 +1,7 @@
 # CHANGELOG
 
+* Cover case when object implements get( ..args) method
+
 ## 1.3.1 - 2023-07-14
 
 * Corrected function argument cleanup of IValueAdapter in case with nested arrays
