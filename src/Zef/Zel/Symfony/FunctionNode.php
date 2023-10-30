@@ -50,8 +50,6 @@ class FunctionNode extends Node
             $arguments[] = $node->evaluate($functions, $values);
         }
         
-        error_log( 'Evaluating function ['.$this->attributes['name'].']');
-        
         $fixed = [];
         foreach ( $arguments as $argument) {
             if ( $argument instanceof IValueAdapter) {
