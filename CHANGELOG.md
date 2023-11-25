@@ -1,5 +1,7 @@
 # CHANGELOG
 
+## 1.3.2 - 2023-11-25
+
 * Cover case when object implements get( ..args) method
 
 ## 1.3.1 - 2023-07-14
