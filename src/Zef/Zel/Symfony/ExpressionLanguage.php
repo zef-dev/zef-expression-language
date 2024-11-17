@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Zef\Zel\Symfony;
 
@@ -27,9 +29,11 @@ class ExpressionLanguage
     private $lexer;
     private $parser;
     private $compiler;
-    
+
     protected $functions = [];
-    
+
+    private $newFunctionsAdded = false;
+
     /**
      * @param ExpressionFunctionProviderInterface[] $providers
      */
@@ -41,7 +45,7 @@ class ExpressionLanguage
             $this->registerProvider($provider);
         }
     }
-    
+
     /**
      * Compiles an expression source code.
      *
@@ -54,7 +58,7 @@ class ExpressionLanguage
     {
         return $this->getCompiler()->compile($this->parse($expression, $names)->getNodes())->getSource();
     }
-    
+
     /**
      * Evaluate an expression.
      *
@@ -68,12 +72,12 @@ class ExpressionLanguage
         $parsed =   $this->parse($expression, array_keys($values));
         $nodes  =   $parsed->getNodes();
         $value  =   $nodes->evaluate($this->functions, $values);
-        if ( $value instanceof IValueAdapter) {
+        if ($value instanceof IValueAdapter) {
             return $value->get();
         }
         return $value;
     }
-    
+
     /**
      * Parses an expression.
      *
@@ -87,29 +91,29 @@ class ExpressionLanguage
         if ($expression instanceof ParsedExpression) {
             return $expression;
         }
-        
+
         asort($names);
         $cacheKeyItems = [];
-        
+
         foreach ($names as $nameKey => $name) {
-            $cacheKeyItems[] = \is_int($nameKey) ? $name : $nameKey.':'.$name;
+            $cacheKeyItems[] = \is_int($nameKey) ? $name : $nameKey . ':' . $name;
         }
-        
-        $cacheItem = $this->cache->getItem(rawurlencode($expression.'//'.implode('|', $cacheKeyItems)));
-        
+
+        $cacheItem = $this->cache->getItem(rawurlencode($expression . '//' . implode('|', $cacheKeyItems)));
+
         if (null === $parsedExpression = $cacheItem->get()) {
             $tokens =   $this->getLexer()->tokenize((string) $expression);
-            $nodes = $this->getParser()->parse( $tokens, $names);
-            
+            $nodes = $this->getParser()->parse($tokens, $names);
+
             $parsedExpression = new ParsedExpression((string) $expression, $nodes);
-            
+
             $cacheItem->set($parsedExpression);
             $this->cache->save($cacheItem);
         }
-        
+
         return $parsedExpression;
     }
-    
+
     /**
      * Registers a function.
      *
@@ -123,54 +127,64 @@ class ExpressionLanguage
      */
     public function register($name, callable $compiler, callable $evaluator)
     {
-        if (null !== $this->parser) {
-            throw new \LogicException('Registering functions after calling evaluate(), compile() or parse() is not supported.');
-        }
-        
+        // if (null !== $this->parser) {
+        //     throw new \LogicException('Registering functions after calling evaluate(), compile() or parse() is not supported.');
+        // }
+
         $this->functions[$name] = ['compiler' => $compiler, 'evaluator' => $evaluator];
+        $this->newFunctionsAdded = true;
     }
-    
+
     public function addFunction(ExpressionFunction $function)
     {
         $this->register($function->getName(), $function->getCompiler(), $function->getEvaluator());
     }
-    
+
     public function registerProvider(ExpressionFunctionProviderInterface $provider)
     {
         foreach ($provider->getFunctions() as $function) {
             $this->addFunction($function);
         }
     }
-    
+
+    public function reset()
+    {
+        $this->parser = null;
+        $this->compiler = null;
+        $this->lexer = null;
+    }
+
     protected function registerFunctions()
     {
         $this->addFunction(ExpressionFunction::fromPhp('constant'));
     }
-    
+
     private function getLexer(): Lexer
     {
         if (null === $this->lexer) {
             $this->lexer = new Lexer();
         }
-        
+
         return $this->lexer;
     }
-    
+
     private function getParser(): Parser
     {
-        if (null === $this->parser) {
+        if (null === $this->parser || $this->newFunctionsAdded) {
             $this->parser = new Parser($this->functions);
+            $this->newFunctionsAdded = false; // Reset the flag
         }
-        
+
         return $this->parser;
     }
-    
+
+
     private function getCompiler(): Compiler
     {
         if (null === $this->compiler) {
             $this->compiler = new Compiler($this->functions);
         }
-        
+
         return $this->compiler->reset();
     }
 }
