@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 1.4.0 - 2023-11-17
+
+* Added ability to register new functions even after callinmg evaluate.
+
 ## 1.3.2 - 2023-11-25
 
 * Cover case when object implements get( ..args) method
