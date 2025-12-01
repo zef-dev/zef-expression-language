@@ -9,42 +9,42 @@ abstract class AbstractResolver implements IValueAdapter, Countable
 
 	abstract public function keys();
 
-	abstract public function count();
+	abstract public function count(): int;
 
 	protected function _fixValue( $value) {
 
-	    if ( is_array( $value) && !self::isArrayIndexed( $value)) {
+	    if ( \is_array( $value) && !self::isArrayIndexed( $value)) {
 			$rsv = new ArrayResolver( $value);
 			return $rsv;
 		}
-		if ( is_object( $value) && !is_a( $value, 'Zef\Zel\IValueAdapter')) {
+		if ( \is_object( $value) && !\is_a( $value, 'Zef\Zel\IValueAdapter')) {
 			$rsv = new ObjectResolver( $value);
 			return $rsv;
 		}
-		if ( is_array( $value)) {
+		if ( \is_array( $value)) {
 			$arr	=	[];
 			foreach ( $value as $item) {
 				$arr[]	=	$this->_fixValue( $item);
 			}
 			return $arr;
 		}
-		
+
 		return $value;
 	}
-	
+
 	public static function cleanValue( $value)
 	{
-	    if ( is_array( $value)) {
+	    if ( \is_array( $value)) {
 	        foreach ( $value as $k=>$v) {
 	            if ( $v instanceof IValueAdapter) {
 	                $value[$k] = $v->get();
 	            }
 	        }
 	    }
-	    
+
 	    return $value;
 	}
-	
+
 	/**
 	 * Returns true if array is indexed (starting with index 0). Will return true for empty arrays too.
 	 * @param array $arr
@@ -55,18 +55,19 @@ abstract class AbstractResolver implements IValueAdapter, Countable
 	    if ( empty( $arr)) {
 	        return true;
 	    }
-	    $keys =   array_keys( $arr);
+	    $keys =   \array_keys( $arr);
 	    foreach ( $keys as $key) {
 	        if ( $key === 0) {
 	            return true;
 	        }
 	        return false;
 	    }
+        return false;
 	}
-	
+
 	// UTIL
 	public function __toString()
 	{
-		return get_class( $this).'';
+		return \get_class( $this).'';
 	}
 }

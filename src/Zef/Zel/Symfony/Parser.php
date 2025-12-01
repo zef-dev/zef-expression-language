@@ -21,17 +21,17 @@ class Parser
 {
     const OPERATOR_LEFT = 1;
     const OPERATOR_RIGHT = 2;
-    
+
     private $stream;
     private $unaryOperators;
     private $binaryOperators;
     private $functions;
     private $names;
-    
+
     public function __construct(array $functions)
     {
         $this->functions = $functions;
-        
+
         $this->unaryOperators = [
             'not' => ['precedence' => 50],
             '!' => ['precedence' => 50],
@@ -67,7 +67,7 @@ class Parser
             '**' => ['precedence' => 200, 'associativity' => self::OPERATOR_RIGHT],
         ];
     }
-    
+
     /**
      * Converts a token stream to a node tree.
      *
@@ -83,7 +83,7 @@ class Parser
      *
      * @param array $names An array of valid names
      *
-     * @return Node\Node A node tree
+     * @return Node A node tree
      *
      * @throws SyntaxError
      */
@@ -91,15 +91,15 @@ class Parser
     {
         $this->stream = $stream;
         $this->names = $names;
-        
+
         $node = $this->parseExpression();
         if (!$stream->isEOF()) {
-            throw new SyntaxError(sprintf('Unexpected token "%s" of value "%s"', $stream->current->type, $stream->current->value), $stream->current->cursor, $stream->getExpression());
+            throw new SyntaxError(\sprintf('Unexpected token "%s" of value "%s"', $stream->current->type, $stream->current->value), $stream->current->cursor, $stream->getExpression());
         }
-        
+
         return $node;
     }
-    
+
     public function parseExpression($precedence = 0)
     {
         $expr = $this->getPrimary();
@@ -107,43 +107,43 @@ class Parser
         while ($token->test(Token::OPERATOR_TYPE) && isset($this->binaryOperators[$token->value]) && $this->binaryOperators[$token->value]['precedence'] >= $precedence) {
             $op = $this->binaryOperators[$token->value];
             $this->stream->next();
-            
+
             $expr1 = $this->parseExpression(self::OPERATOR_LEFT === $op['associativity'] ? $op['precedence'] + 1 : $op['precedence']);
             $expr = new BinaryNode($token->value, $expr, $expr1);
-            
+
             $token = $this->stream->current;
         }
-        
+
         if (0 === $precedence) {
             return $this->parseConditionalExpression($expr);
         }
-        
+
         return $expr;
     }
-    
+
     protected function getPrimary()
     {
         $token = $this->stream->current;
-        
+
         if ($token->test(Token::OPERATOR_TYPE) && isset($this->unaryOperators[$token->value])) {
             $operator = $this->unaryOperators[$token->value];
             $this->stream->next();
             $expr = $this->parseExpression($operator['precedence']);
-            
+
             return $this->parsePostfixExpression(new UnaryNode($token->value, $expr));
         }
-        
+
         if ($token->test(Token::PUNCTUATION_TYPE, '(')) {
             $this->stream->next();
             $expr = $this->parseExpression();
             $this->stream->expect(Token::PUNCTUATION_TYPE, ')', 'An opened parenthesis is not properly closed');
-            
+
             return $this->parsePostfixExpression($expr);
         }
-        
+
         return $this->parsePrimaryExpression();
     }
-    
+
     protected function parseConditionalExpression($expr)
     {
         while ($this->stream->current->test(Token::PUNCTUATION_TYPE, '?')) {
@@ -161,13 +161,13 @@ class Parser
                 $expr2 = $expr;
                 $expr3 = $this->parseExpression();
             }
-            
+
             $expr = new ConditionalNode($expr, $expr2, $expr3);
         }
-        
+
         return $expr;
     }
-    
+
     public function parsePrimaryExpression()
     {
         $token = $this->stream->current;
@@ -178,21 +178,21 @@ class Parser
                     case 'true':
                     case 'TRUE':
                         return new ConstantNode(true);
-                        
+
                     case 'false':
                     case 'FALSE':
                         return new ConstantNode(false);
-                        
+
                     case 'null':
                     case 'NULL':
                         return new ConstantNode(null);
-                        
+
                     default:
                         if ('(' === $this->stream->current->value) {
                             if (false === isset($this->functions[$token->value])) {
-                                throw new SyntaxError(sprintf('The function "%s" does not exist', $token->value), $token->cursor, $this->stream->getExpression(), $token->value, array_keys($this->functions));
+                                throw new SyntaxError(\sprintf('The function "%s" does not exist', $token->value), $token->cursor, $this->stream->getExpression(), $token->value, \array_keys($this->functions));
                             }
-                            
+
                             $node = new FunctionNode($token->value, $this->parseArguments());
                         } else {
                             if (!\in_array($token->value, $this->names, true)) {
@@ -204,73 +204,73 @@ class Parser
                                 if (\is_int($name = array_search($token->value, $this->names))) {
                                     $name = $token->value;
                                 }
-                                
+
                                 $node = new NameNode($name);
                             }
                         }
                 }
                 break;
-                
+
             case Token::NUMBER_TYPE:
             case Token::STRING_TYPE:
                 $this->stream->next();
-                
+
                 return new ConstantNode($token->value);
-                
+
             default:
                 if ($token->test(Token::PUNCTUATION_TYPE, '[')) {
                     $node = $this->parseArrayExpression();
                 } elseif ($token->test(Token::PUNCTUATION_TYPE, '{')) {
                     $node = $this->parseHashExpression();
                 } else {
-                    throw new SyntaxError(sprintf('Unexpected token "%s" of value "%s"', $token->type, $token->value), $token->cursor, $this->stream->getExpression());
+                    throw new SyntaxError(\sprintf('Unexpected token "%s" of value "%s"', $token->type, $token->value), $token->cursor, $this->stream->getExpression());
                 }
         }
-        
+
         return $this->parsePostfixExpression($node);
     }
-    
+
     public function parseArrayExpression()
     {
         $this->stream->expect(Token::PUNCTUATION_TYPE, '[', 'An array element was expected');
-        
+
         $node = new ArrayNode();
         $first = true;
         while (!$this->stream->current->test(Token::PUNCTUATION_TYPE, ']')) {
             if (!$first) {
                 $this->stream->expect(Token::PUNCTUATION_TYPE, ',', 'An array element must be followed by a comma');
-                
+
                 // trailing ,?
                 if ($this->stream->current->test(Token::PUNCTUATION_TYPE, ']')) {
                     break;
                 }
             }
             $first = false;
-            
+
             $node->addElement($this->parseExpression());
         }
         $this->stream->expect(Token::PUNCTUATION_TYPE, ']', 'An opened array is not properly closed');
-        
+
         return $node;
     }
-    
+
     public function parseHashExpression()
     {
         $this->stream->expect(Token::PUNCTUATION_TYPE, '{', 'A hash element was expected');
-        
+
         $node = new ArrayNode();
         $first = true;
         while (!$this->stream->current->test(Token::PUNCTUATION_TYPE, '}')) {
             if (!$first) {
                 $this->stream->expect(Token::PUNCTUATION_TYPE, ',', 'A hash value must be followed by a comma');
-                
+
                 // trailing ,?
                 if ($this->stream->current->test(Token::PUNCTUATION_TYPE, '}')) {
                     break;
                 }
             }
             $first = false;
-            
+
             // a hash key can be:
             //
             //  * a number -- 12
@@ -284,20 +284,20 @@ class Parser
                 $key = $this->parseExpression();
             } else {
                 $current = $this->stream->current;
-                
-                throw new SyntaxError(sprintf('A hash key must be a quoted string, a number, a name, or an expression enclosed in parentheses (unexpected token "%s" of value "%s"', $current->type, $current->value), $current->cursor, $this->stream->getExpression());
+
+                throw new SyntaxError(\sprintf('A hash key must be a quoted string, a number, a name, or an expression enclosed in parentheses (unexpected token "%s" of value "%s"', $current->type, $current->value), $current->cursor, $this->stream->getExpression());
             }
-            
+
             $this->stream->expect(Token::PUNCTUATION_TYPE, ':', 'A hash key must be followed by a colon (:)');
             $value = $this->parseExpression();
-            
+
             $node->addElement($value, $key);
         }
         $this->stream->expect(Token::PUNCTUATION_TYPE, '}', 'An opened hash is not properly closed');
-        
+
         return $node;
     }
-    
+
     public function parsePostfixExpression($node)
     {
         $token = $this->stream->current;
@@ -306,7 +306,7 @@ class Parser
                 $this->stream->next();
                 $token = $this->stream->current;
                 $this->stream->next();
-                
+
                 if (
                     Token::NAME_TYPE !== $token->type
                     &&
@@ -325,9 +325,9 @@ class Parser
                     ) {
                         throw new SyntaxError('Expected name', $token->cursor, $this->stream->getExpression());
                     }
-                    
+
                     $arg = new ConstantNode($token->value, true);
-                    
+
                     $arguments = new ArgumentsNode();
                     if ($this->stream->current->test(Token::PUNCTUATION_TYPE, '(')) {
                         $type = GetAttrNode::METHOD_CALL;
@@ -337,24 +337,24 @@ class Parser
                     } else {
                         $type = GetAttrNode::PROPERTY_CALL;
                     }
-                    
+
                     $node = new GetAttrNode($node, $arg, $arguments, $type);
             } elseif ('[' === $token->value) {
                 $this->stream->next();
                 $arg = $this->parseExpression();
                 $this->stream->expect(Token::PUNCTUATION_TYPE, ']');
-                
+
                 $node = new GetAttrNode($node, $arg, new ArgumentsNode(), GetAttrNode::ARRAY_CALL);
             } else {
                 break;
             }
-            
+
             $token = $this->stream->current;
         }
-        
+
         return $node;
     }
-    
+
     /**
      * Parses arguments.
      */
@@ -366,11 +366,11 @@ class Parser
             if (!empty($args)) {
                 $this->stream->expect(Token::PUNCTUATION_TYPE, ',', 'Arguments must be separated by a comma');
             }
-            
+
             $args[] = $this->parseExpression();
         }
         $this->stream->expect(Token::PUNCTUATION_TYPE, ')', 'A list of arguments must be closed by a parenthesis');
-        
+
         return new Node($args);
     }
 }
