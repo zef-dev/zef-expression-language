@@ -12,6 +12,7 @@ use Symfony\Component\ExpressionLanguage\Node\ConstantNode;
 use Symfony\Component\ExpressionLanguage\Node\ConditionalNode;
 use Symfony\Component\ExpressionLanguage\Node\ArrayNode;
 use Symfony\Component\ExpressionLanguage\Node\ArgumentsNode;
+use Symfony\Component\ExpressionLanguage\Node\GetAttrNode as SymfonyGetAttrNode;
 
 /**
  * This class is copy/paste from Smyfony v4.4. It seemed impossible to just extend and implement only changed methods.
@@ -330,12 +331,12 @@ class Parser
 
                     $arguments = new ArgumentsNode();
                     if ($this->stream->current->test(Token::PUNCTUATION_TYPE, '(')) {
-                        $type = GetAttrNode::METHOD_CALL;
+                        $type = SymfonyGetAttrNode::METHOD_CALL;
                         foreach ($this->parseArguments()->nodes as $n) {
                             $arguments->addElement($n);
                         }
                     } else {
-                        $type = GetAttrNode::PROPERTY_CALL;
+                        $type = SymfonyGetAttrNode::PROPERTY_CALL;
                     }
 
                     $node = new GetAttrNode($node, $arg, $arguments, $type);
@@ -344,7 +345,7 @@ class Parser
                 $arg = $this->parseExpression();
                 $this->stream->expect(Token::PUNCTUATION_TYPE, ']');
 
-                $node = new GetAttrNode($node, $arg, new ArgumentsNode(), GetAttrNode::ARRAY_CALL);
+                $node = new GetAttrNode($node, $arg, new ArgumentsNode(), SymfonyGetAttrNode::ARRAY_CALL);
             } else {
                 break;
             }
