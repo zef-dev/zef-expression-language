@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 1.4.1 - 2025-12-01
+
+* Check if the property is private before reading
+
 ## 1.4.0 - 2023-11-17
 
 * Added ability to register new functions even after callinmg evaluate.

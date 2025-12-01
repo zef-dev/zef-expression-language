@@ -3,13 +3,13 @@
     "type": "library",
 	"description" : "A JUEL like extension for Symfony Expression Language",
     "homepage": "https://github.com/zef-dev/zef-expression-language",
-    "version": "1.4.0",
+    "version": "1.4.1",
 	"keywords" : [
 		"symfony", "expression-language"
 	],
 	"license" : "MIT",
 	"require" : {
-		"php" : "^7.2.5",
+		"php" : "^7.2.5",   
         "psr/cache" : "^1.0.1",
         "symfony/expression-language" : "^5"
 	},
