@@ -35,10 +35,13 @@ class ObjectResolver extends AbstractResolver
 	}
 	
 	public function __get( $name) {
-		
-		if (property_exists($this->_object, $name)) {
-			return $this->_fixValue($this->_object->$name);
-		}
+        // Only directly access *public* properties. get_object_vars() returns public
+        // properties in the current scope, which avoids trying to read private/protected
+        // properties on foreign objects (e.g. PSR-7 implementations).
+        $publicProps = get_object_vars($this->_object);
+        if (array_key_exists($name, $publicProps)) {
+            return $this->_fixValue($publicProps[$name]);
+        }
 
 		$variants	=	$this->_getVariants( $name);
 		

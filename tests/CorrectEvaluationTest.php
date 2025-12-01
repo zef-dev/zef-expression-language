@@ -123,6 +123,26 @@ class CorrectEvaluationTest extends TestCase
         $el->evaluate('foo.sayHi()', ['foo' => $user]);
     }
 
+    public function testResolveWrappedPrivatePropertyUsesGetter()
+    {
+        $request = new class() {
+            private $parsedBody = ['foo' => 'bar'];
+
+            public function getParsedBody()
+            {
+                return $this->parsedBody;
+            }
+        };
+
+        $el = new ExpressionLanguage();
+        $adapter = new ObjectResolver($request);
+
+        $this->assertEquals(
+            ['foo' => 'bar'],
+            $el->evaluate('request.parsedBody', ['request' => $adapter])
+        );
+    }
+
     /**
      * @dataProvider provideSimpleValues
      * @dataProvider provideArrayValues
