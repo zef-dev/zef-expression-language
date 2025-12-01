@@ -6,6 +6,22 @@ namespace Zef\Zel\Symfony;
 class GetAttrNode extends \Symfony\Component\ExpressionLanguage\Node\GetAttrNode
 {
 
+    /**
+     * Polyfill for str_contains() function (available since PHP 8.0)
+     *
+     * @param string $haystack The string to search in
+     * @param string $needle The substring to search for
+     * @return bool True if needle is found in haystack, false otherwise
+     */
+    private function _strContains(string $haystack, string $needle): bool
+    {
+        if (\function_exists('str_contains')) {
+            return \str_contains($haystack, $needle);
+        }
+
+        return \strpos($haystack, $needle) !== false;
+    }
+
     public function evaluate( $functions, $values)
     {
         switch ($this->attributes['type']) {
@@ -88,7 +104,7 @@ class GetAttrNode extends \Symfony\Component\ExpressionLanguage\Node\GetAttrNode
                 $wrappedClassMethods = get_class_methods($object);
 
                 foreach ($wrappedClassMethods as $wrappedClassMethod) {
-                    if ( \str_contains(strtolower($wrappedClassMethod), strtolower($value))) {
+                    if ($this->_strContains(strtolower($wrappedClassMethod), strtolower($value))) {
                         $isAccessible++;
                     }
                 }
@@ -96,7 +112,7 @@ class GetAttrNode extends \Symfony\Component\ExpressionLanguage\Node\GetAttrNode
                 if ( \is_a( $object, 'Zef\Zel\IValueAdapter')) {
                     $originalClassMethods = get_class_methods($object->get());
                     foreach ($originalClassMethods as $originalClassMethod) {
-                        if ( \str_contains(strtolower($originalClassMethod), strtolower($value))) {
+                        if ($this->_strContains(strtolower($originalClassMethod), strtolower($value))) {
                             $isAccessible++;
                         }
                     }
